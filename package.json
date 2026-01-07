@@ -6,8 +6,7 @@
 	"scripts": {
 		"start": "bun run src/index.ts",
 		"dev": "bun --watch src/index.ts",
-		"check": "biome check .",
-		"lint": "biome check --write .",
+		"check": "biome check --write .",
 		"typecheck": "tsc --noEmit"
 	},
 	"devDependencies": {
@@ -19,6 +18,8 @@
 		"typescript": "^5"
 	},
 	"dependencies": {
+		"@effect/platform": "^0.94.1",
+		"@effect/platform-bun": "^0.87.0",
 		"effect": "^3.19.14"
 	}
 }
