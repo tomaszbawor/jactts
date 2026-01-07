@@ -1,0 +1,20 @@
+{
+	"name": "jactts",
+	"module": "index.ts",
+	"type": "module",
+	"private": true,
+	"scripts": {
+		"start": "bun run src/index.ts",
+		"dev": "bun --watch src/index.ts",
+		"check": "biome check .",
+		"lint": "biome check --write .",
+		"typecheck": "tsc --noEmit"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.3.11",
+		"@types/bun": "latest"
+	},
+	"peerDependencies": {
+		"typescript": "^5"
+	}
+}
