@@ -1,4 +1,4 @@
-import { Command } from "@effect/platform";
+import { Command, FileSystem } from "@effect/platform";
 import { Effect } from "effect";
 
 export const generateTTSAudio = (
@@ -27,6 +27,13 @@ export const generateTTSAudio = (
 			);
 		}
 	});
+
+export const generateTempWavFilename = Effect.gen(function* () {
+	const fs = yield* FileSystem.FileSystem;
+	return yield* fs.makeTempFile({
+		suffix: ".wav",
+	});
+});
 
 export const playAudio = (fileName: string) =>
 	Effect.gen(function* () {
