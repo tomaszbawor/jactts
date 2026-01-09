@@ -21,6 +21,7 @@
 	"dependencies": {
 		"@effect/platform": "^0.94.1",
 		"@effect/platform-bun": "^0.87.0",
+		"@faker-js/faker": "^10.2.0",
 		"effect": "^3.19.14"
 	}
 }
