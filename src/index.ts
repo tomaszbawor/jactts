@@ -1,5 +1,6 @@
 import { BunContext, BunRuntime } from "@effect/platform-bun";
-import { Effect, Queue, Schedule } from "effect";
+import { Effect, type Queue } from "effect";
+import { generateTTSAudio } from "./tts/audiogen";
 
 const backgroundProducerTask = (queue: Queue.Queue<string>) => {
 	var iterator = 0;
@@ -29,14 +30,9 @@ const program = Effect.gen(function* () {
 	yield* Effect.logInfo("App started ...");
 	yield* Effect.logInfo("Initializing ...");
 
-	const queue = yield* Queue.bounded<string>(5);
-	//
-	yield* Effect.fork(backgroundProducerTask(queue));
-	yield* Effect.sleep("1 second");
+	const duration = r[0];
 
-	yield* Effect.fork(backtroundConsumerTask(queue));
-
-	yield* Effect.sleep("10 seconds");
+	yield* Effect.logInfo("Duration: ", duration.toString());
 });
 
 const programWithDeps = program.pipe(Effect.provide(BunContext.layer));
