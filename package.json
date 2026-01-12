@@ -8,9 +8,10 @@
 		"dev": "bun --watch src/index.ts",
 		"check": "biome check --write .",
 		"prepare": "effect-language-service patch",
-		"typecheck": "tsc --noEmit"
+		"typecheck": "tsgo --noEmit"
 	},
 	"devDependencies": {
+		"@typescript/native-preview": "latest",
 		"@biomejs/biome": "^2.3.11",
 		"@effect/language-service": "^0.64.1",
 		"@types/bun": "latest"
