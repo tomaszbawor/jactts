@@ -1,13 +1,8 @@
 import { Url, UrlParams } from "@effect/platform";
 import { Effect, Either, pipe, Redacted } from "effect";
-import { loadTwitchConfig } from "./twich.config";
-
-export const TWITCH_OAUTH_TOKEN_URL = "https://id.twitch.tv/oauth2/token";
-export const TWITCH_OAUTH_AUTHORIZE_URL =
-	"https://id.twitch.tv/oauth2/authorize";
+import { loadTwitchConfig, TWITCH_OAUTH_AUTHORIZE_URL } from "./twich.config";
 
 export const openTwichAuthorization = Effect.gen(function* () {
-	// const client = yield* HttpClient;
 	const config = yield* loadTwitchConfig;
 
 	const authParams = pipe(
@@ -15,7 +10,7 @@ export const openTwichAuthorization = Effect.gen(function* () {
 		UrlParams.append("client_id", Redacted.value(config.clientId)),
 		UrlParams.append("redirect_uri", config.oauthRedirectUri),
 		UrlParams.append("response_type", "code"),
-		UrlParams.append("scope", "user:bot"),
+		UrlParams.append("scope", "user:bot"), // TODO: Add to config
 	);
 
 	const urlBaseEither = Url.fromString(TWITCH_OAUTH_AUTHORIZE_URL);

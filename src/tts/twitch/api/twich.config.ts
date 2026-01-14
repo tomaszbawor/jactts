@@ -1,5 +1,9 @@
 import { Config, Effect, Schema } from "effect";
 
+export const TWITCH_OAUTH_AUTHORIZE_URL =
+	"https://id.twitch.tv/oauth2/authorize";
+export const TWITCH_OAUTH_TOKEN_URL = "https://id.twitch.tv/oauth2/token";
+
 export class TwitchConfig extends Schema.Class<TwitchConfig>("TwitchConfig")({
 	clientId: Schema.Redacted(Schema.String),
 	clientSecret: Schema.Redacted(Schema.String),

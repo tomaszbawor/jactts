@@ -7,13 +7,14 @@ import {
 } from "@effect/platform-bun";
 import { Effect, Fiber, Layer } from "effect";
 import { TextToSpeechService } from "./tts/TTSService";
+import { CallbackServer } from "./tts/twitch/api/twitch.callback.server";
 import { openTwichAuthorization } from "./tts/twitch/api/twitch.login-url.display";
 
 const program = Effect.gen(function* () {
 	yield* Effect.logInfo("Initializing application ...");
 
 	// 1. Run HTTP Server with oauth callback
-	const callbackApiServer = yield* Effect.fork(Layer.launch(ServerLive));
+	const callbackApiServer = yield* Effect.fork(Layer.launch(CallbackServer));
 	// 1. Open browser with URL for getting auth code
 
 	yield* openTwichAuthorization;
