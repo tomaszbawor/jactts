@@ -19,4 +19,18 @@ export const SessionWelcomeSchema = Schema.Struct({
 	}),
 });
 
+export const KeepAliveSchema = Schema.Struct({
+	metadata: Schema.Struct({
+		message_id: Schema.String,
+		message_type: Schema.Literal("session_keepalive"),
+		message_timestamp: Schema.DateTimeUtc,
+	}),
+	payload: Schema.Struct({}),
+});
+
+export const TwitchWebSocketMessage = Schema.Union(
+	SessionWelcomeSchema,
+	KeepAliveSchema,
+);
+
 // type SessionWelcome = typeof SessionWelcomeSchema.Type;

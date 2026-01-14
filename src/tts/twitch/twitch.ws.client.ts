@@ -1,7 +1,13 @@
 import { makeWebSocket } from "@effect/platform/Socket";
-import { Effect, Fiber, Schema } from "effect";
+import { Data, Effect, Fiber, Schema } from "effect";
 import { TWITCH_WS_URL } from "./config";
-import { SessionWelcomeSchema } from "./messages/SessionWelcome";
+import { TwitchWebSocketMessage } from "./messages/SessionWelcome";
+
+class TwitchWsError extends Data.TaggedError("TwitchWsError")<{
+	message: string;
+	// biome-ignore lint/suspicious/noExplicitAny: Its fine its error
+	cause: any;
+}> {}
 
 export const websocketConnect = Effect.gen(function* () {
 	const ws = yield* makeWebSocket(TWITCH_WS_URL);
@@ -10,6 +16,11 @@ export const websocketConnect = Effect.gen(function* () {
 		ws.run((msgBytes) =>
 			Effect.gen(function* () {
 				const welcomeMessage = yield* decodeSchemaFromByteArray(msgBytes);
+
+				if (welcomeMessage.metadata.message_type === "session_welcome") {
+					welcomeMessage.payload;
+				}
+
 				yield* Effect.logInfo("Incoming message: ", welcomeMessage);
 			}),
 		),
@@ -17,8 +28,6 @@ export const websocketConnect = Effect.gen(function* () {
 
 	yield* readerFiber;
 
-	// const wr = yield* ws.writer;
-	// yield* wr("hello");
 	yield* Fiber.join(readerFiber);
 });
 
@@ -30,8 +39,12 @@ const decodeSchemaFromByteArray = (bytes: Uint8Array) =>
 		const json = yield* Effect.try({
 			try: () => JSON.parse(text),
 			//TODO: Change this error into custom one
-			catch: (_e) => new Error("Invalid Json"),
+			catch: (e) =>
+				new TwitchWsError({
+					message: "Unable to parse json",
+					cause: e,
+				}),
 		});
 
-		return yield* Schema.decodeUnknown(SessionWelcomeSchema)(json);
+		return yield* Schema.decodeUnknown(TwitchWebSocketMessage)(json);
 	});
