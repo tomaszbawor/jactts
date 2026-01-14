@@ -7,8 +7,7 @@ import {
 } from "@effect/platform-bun";
 import { Effect, Fiber, Layer } from "effect";
 import { TextToSpeechService } from "./tts/TTSService";
-import { openTwichAuthorization } from "./tts/twitch/api/twitch.api-client";
-import { ServerLive } from "./tts/twitch/api/twitch.redirect";
+import { openTwichAuthorization } from "./tts/twitch/api/twitch.login-url.display";
 
 const program = Effect.gen(function* () {
 	yield* Effect.logInfo("Initializing application ...");
