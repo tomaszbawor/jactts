@@ -4,9 +4,10 @@ import {
 	HttpApiEndpoint,
 	HttpApiGroup,
 	HttpApiSwagger,
+	Url,
 } from "@effect/platform";
 import { BunHttpServer } from "@effect/platform-bun";
-import { Effect, Layer, Schema } from "effect";
+import { Effect, Either, Layer, Schema } from "effect";
 
 const CallbackApi = HttpApi.make("CallbackAPI").add(
 	HttpApiGroup.make("Callback").add(
@@ -17,9 +18,21 @@ const CallbackApi = HttpApi.make("CallbackAPI").add(
 );
 
 const ApiLive = HttpApiBuilder.group(CallbackApi, "Callback", (handlers) => {
-	return handlers.handle("callback", () =>
+	return handlers.handle("callback", (request) =>
 		Effect.gen(function* () {
-			yield* Effect.logInfo("Mame jestem w tv");
+			const urlEither = Url.fromString(request.request.originalUrl);
+
+			if (Either.isRight(urlEither)) {
+				const url = urlEither.right;
+				const sp = url.searchParams;
+
+				const _code = sp.get("code");
+				const _scope = sp.get("scope");
+
+				// TODO: Continue
+			}
+			yield* Effect.logInfo(request);
+
 			return "ELO";
 		}),
 	);

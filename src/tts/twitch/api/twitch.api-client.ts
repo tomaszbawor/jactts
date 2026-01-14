@@ -14,7 +14,7 @@ export const openTwichAuthorization = Effect.gen(function* () {
 		UrlParams.empty,
 		UrlParams.append("client_id", Redacted.value(config.clientId)),
 		UrlParams.append("redirect_uri", config.oauthRedirectUri),
-		UrlParams.append("response_type", "token"),
+		UrlParams.append("response_type", "code"),
 		UrlParams.append("scope", "user:bot"),
 	);
 
