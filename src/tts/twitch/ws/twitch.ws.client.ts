@@ -1,7 +1,7 @@
 import { makeWebSocket } from "@effect/platform/Socket";
 import { Data, Effect, Fiber, Schema } from "effect";
-import { TWITCH_WS_URL } from "./config";
-import { TwitchWebSocketMessage } from "./messages/SessionWelcome";
+import { TWITCH_WS_URL } from "../config";
+import { TwitchWebSocketMessage } from "./SessionWelcome";
 
 class TwitchWsError extends Data.TaggedError("TwitchWsError")<{
 	message: string;
