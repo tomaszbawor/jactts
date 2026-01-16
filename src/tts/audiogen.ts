@@ -1,6 +1,10 @@
 import { Command, FileSystem } from "@effect/platform";
 import { Data, Effect } from "effect";
 
+class AudioGenerationError extends Data.TaggedError("PlayAudioError")<{
+	message: string;
+}> {}
+
 export const generateTTSAudio = (
 	text: string,
 	outputFile: string = "out.wav",
@@ -21,10 +25,9 @@ export const generateTTSAudio = (
 		const piperReturnCode = yield* Command.exitCode(textGenerationCommand);
 
 		if (piperReturnCode > 0) {
-			yield* Effect.logError(
-				"Error while generating TTS, returned status",
-				piperReturnCode,
-			);
+			return new AudioGenerationError({
+				message: `Error while generating TTS, piper status: ${piperReturnCode}`,
+			});
 		}
 	});
 
