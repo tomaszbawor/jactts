@@ -5,15 +5,17 @@ import {
 	BunRuntime,
 	BunSocket,
 } from "@effect/platform-bun";
-import { Effect, Layer } from "effect";
-import { TextToSpeechService } from "./tts/TTSService";
+import { Effect, Fiber, Layer } from "effect";
+import { TextToSpeechService } from "./tts/textToSpeech.service";
 import { TwitchApiClientService } from "./tts/twitch/client/twitch.api.client";
+import { websocketConnect } from "./tts/twitch/ws/twitch.ws.client";
 
 const program = Effect.gen(function* () {
 	yield* Effect.logInfo("Initializing application ...");
 
 	// 1. Run HTTP Server with oauth callback
-	// const callbackApiServer = yield* Effect.fork(Layer.launch(CallbackServer));
+	//const callbackApiServer = yield* Effect.fork(Layer.launch(CallbackServer));
+
 	// 2. Open browser with URL for getting auth code
 	// yield* openTwichAuthorization;
 
@@ -21,13 +23,15 @@ const program = Effect.gen(function* () {
 	// TODO:
 	//
 	// 1. Start web socket connections and sub for messages
-
-	// yield* websocketConnect;
-	// yield* twixAPi;
+	const wsFiber = yield* websocketConnect((sid) => {
+		console.log(`Dostalem sesje ziomek: ${sid}`);
+	});
+	//  yield* twixAPi;
 	//
-	const ApiClient = yield* TwitchApiClientService;
-	yield* ApiClient.subscribeToEvent();
+	// const ApiClient = yield* TwitchApiClientService;
+	// yield* ApiClient.subscribeToEvent();
 
+	yield* Fiber.join(wsFiber);
 	// return yield* Fiber.join(callbackApiServer);
 });
 

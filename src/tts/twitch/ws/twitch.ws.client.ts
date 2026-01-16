@@ -1,7 +1,10 @@
 import { makeWebSocket } from "@effect/platform/Socket";
-import { Data, Effect, Fiber, Schema } from "effect";
+import { Data, Effect, Schema } from "effect";
 import { TWITCH_WS_URL } from "../config";
-import { TwitchWebSocketMessage } from "./SessionWelcome";
+import {
+	type SessionWelcomeSchema,
+	TwitchWebSocketMessage,
+} from "./twitch.ws.messages";
 
 class TwitchWsError extends Data.TaggedError("TwitchWsError")<{
 	message: string;
@@ -9,27 +12,36 @@ class TwitchWsError extends Data.TaggedError("TwitchWsError")<{
 	cause: any;
 }> {}
 
-export const websocketConnect = Effect.gen(function* () {
-	const ws = yield* makeWebSocket(TWITCH_WS_URL);
+export const websocketConnect = (
+	setSessionIdCallback: (sessionId: string) => void,
+) =>
+	Effect.gen(function* () {
+		const ws = yield* makeWebSocket(TWITCH_WS_URL);
 
-	const readerFiber = yield* Effect.fork(
-		ws.run((msgBytes) =>
-			Effect.gen(function* () {
-				const welcomeMessage = yield* decodeSchemaFromByteArray(msgBytes);
+		const readerFiber = yield* Effect.fork(
+			ws.run((msgBytes) =>
+				Effect.gen(function* () {
+					const wsMessage = yield* decodeSchemaFromByteArray(msgBytes);
 
-				if (welcomeMessage.metadata.message_type === "session_welcome") {
-					welcomeMessage.payload;
-				}
+					if (isWelcomeMessage(wsMessage)) {
+						const sessionId = wsMessage.payload.session.id;
+						setSessionIdCallback(sessionId);
+					}
 
-				yield* Effect.logInfo("Incoming message: ", welcomeMessage);
-			}),
-		),
-	);
+					yield* Effect.logInfo("Incoming message: ", wsMessage);
+				}),
+			),
+		);
 
-	yield* readerFiber;
+		yield* readerFiber;
+		return readerFiber;
+	});
 
-	yield* Fiber.join(readerFiber);
-});
+function isWelcomeMessage(
+	msg: typeof TwitchWebSocketMessage.Type,
+): msg is typeof SessionWelcomeSchema.Type {
+	return msg.metadata.message_type === "session_welcome";
+}
 
 // Make it generic for all messages
 const decodeSchemaFromByteArray = (bytes: Uint8Array) =>
@@ -38,7 +50,6 @@ const decodeSchemaFromByteArray = (bytes: Uint8Array) =>
 
 		const json = yield* Effect.try({
 			try: () => JSON.parse(text),
-			//TODO: Change this error into custom one
 			catch: (e) =>
 				new TwitchWsError({
 					message: "Unable to parse json",

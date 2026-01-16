@@ -1,5 +1,5 @@
 import { Command, FileSystem } from "@effect/platform";
-import { Effect } from "effect";
+import { Data, Effect } from "effect";
 
 export const generateTTSAudio = (
 	text: string,
@@ -35,6 +35,10 @@ export const generateTempWavFilename = Effect.gen(function* () {
 	});
 });
 
+class PlayAudioError extends Data.TaggedError("PlayAudioError")<{
+	message: string;
+}> {}
+
 export const playAudio = (fileName: string) =>
 	Effect.gen(function* () {
 		const playCommand = Command.make("aplay", fileName);
@@ -43,9 +47,9 @@ export const playAudio = (fileName: string) =>
 
 		if (playReturnCode > 0) {
 			//TODO: Replace with yieldable effect errors
-			yield* Effect.logError(
-				"Unable to play, got return code ",
-				playReturnCode,
-			);
+			//
+			return yield* new PlayAudioError({
+				message: `PlayAudioError: aplay app returned code: ${playReturnCode}`,
+			});
 		}
 	});

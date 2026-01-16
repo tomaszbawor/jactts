@@ -6,7 +6,8 @@
 	"scripts": {
 		"start": "bun run src/index.ts",
 		"dev": "bun --watch src/index.ts",
-		"check": "biome check --write .",
+		"check": "bun typecheck & bun biome:check",
+		"biome:check": "biome check --write .",
 		"prepare": "effect-language-service patch",
 		"typecheck": "tsgo --noEmit"
 	},
